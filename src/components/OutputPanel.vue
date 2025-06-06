@@ -37,6 +37,7 @@ const errorText = ref("");
 const outputPanel = ref();
 const isFullscreen = ref(false);
 const heightBeforeFullscreen = ref("");
+let previousEditorHeight = 0;
 
 const runCypher = async (cypher) => {
   loading.value = true;
@@ -99,6 +100,13 @@ const fullscreenQuery = (isFullscreen) => {
   }
 };
 
+const handleEditorHeightChange = (newHeight) => {
+  const diff = newHeight - previousEditorHeight;
+  previousEditorHeight = newHeight;
+  const height = outputPanel.value.offsetHeight;
+  outputPanel.value.style.height = `${height + diff}px`;
+};
+
 onMounted(() => {
   run(props.query, props.queryTypeInput);
   if (!props.disableResizer) {
@@ -152,6 +160,7 @@ onMounted(() => {
       :serve-in-output="true"
       @run="run"
       @clear="emits('clear')"
+      @editorHeightChanged="handleEditorHeightChange"
     />
     <q-skeleton v-if="loading" width="100%" height="100%" animation="wave" />
     <div v-else class="output-container">
