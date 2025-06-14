@@ -7,7 +7,7 @@ import Feedback from "./Feedback.vue";
 
 const GlobalVariables = inject("GlobalVariables");
 
-const emits = defineEmits(["run", "clear"]);
+const emits = defineEmits(["run", "clear", "editorHeightChanged"]);
 
 const props = defineProps([
   "cypherInput",
@@ -21,6 +21,22 @@ const tab = ref("");
 let cypher = "";
 let text = "";
 let editor = null;
+const minHeight = 3;
+const maxHeight = 10;
+const lineHeight = 20;
+const padding = 10;
+
+const updateEditorHeight = () => {
+  const lineCount = editor.getModel().getLineCount();
+  const newHeight = Math.min (
+    Math.max(lineCount * lineHeight, minHeight * lineHeight), maxHeight * lineHeight
+  )+ padding * 2;
+  code.value.style.height = `${newHeight}px`;
+  if(lineCount<maxHeight){
+    emits('editorHeightChanged', newHeight);
+  }
+  editor.layout();
+};
 
 const runQuery = () => {
   const getValue = editor.getValue();
@@ -93,7 +109,21 @@ onMounted(() => {
     },
     automaticLayout: true,
     contextmenu: false,
+    scrollBeyondLastLine: false,
+    lineHeight: lineHeight,
+    padding: { top:10, bottom: 10 }
   });
+
+  let previousLineCount = editor.getModel().getLineCount();
+
+  editor.onDidChangeModelContent(() => {
+    const currentLineCount = editor.getModel().getLineCount();
+    if (currentLineCount !== previousLineCount) {
+        previousLineCount = currentLineCount;
+        updateEditorHeight();
+    }
+  });
+
   window.addEventListener("hitResult", () => {
     // console.log(e)
   });
@@ -183,7 +213,8 @@ onMounted(() => {
 <style scoped>
 .input-container {
   width: 100%;
-  height: 100px;
+  min-height: v-bind("minHeight * lineHeight + padding * 2 + 'px'");
+  max-height: v-bind("maxHeight * lineHeight + padding * 2 + 'px'");
   padding-top: 4px;
   padding-bottom: 4px;
   background-color: #f9fcff;
@@ -193,7 +224,7 @@ onMounted(() => {
 }
 .code {
   width: 100%;
-  height: 100%;
+  height: v-bind("minHeight * lineHeight + padding * 2 + 'px'");
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
