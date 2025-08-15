@@ -55,6 +55,7 @@ const run = async (queryInput) => {
   tab.value = 'graph'
   cypherQuery.value = queryInput
   runCypher(cypherQuery.value)
+  expandedNodesState.value.clear()
   emits('update', {
     query: queryInput
   })
@@ -84,9 +85,9 @@ const handleNodeExpanded = ({ newNodes, newRels, expandedState }) => {
   expandedNodesState.value = expandedState
 }
 
-const handleNodeUnexpanded = ({ newNodes, newRels, expandedState }) => {
-  nodes.value = newNodes
-  relationships.value = newRels
+const handleNodeUnexpanded = ({ removedNodeIds, removedRelIds, expandedState }) => {
+  nodes.value = nodes.value.filter(n => !removedNodeIds.includes(n.id))
+  relationships.value = relationships.value.filter(r => !removedRelIds.includes(r.id))
   expandedNodesState.value = expandedState
 }
 
@@ -159,7 +160,7 @@ onMounted(() => {
           <GraphOutput
             :nodes="nodes"
             :relationships="relationships"
-            :expanded-nodes-state="expandedNodesState"
+            :expandedNodesState="expandedNodesState"
             @nodeExpanded="handleNodeExpanded"
             @nodeUnexpanded="handleNodeUnexpanded"
           />

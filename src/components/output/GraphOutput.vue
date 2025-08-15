@@ -126,12 +126,9 @@ const nodeUnexpand = (nodeId) => {
     nvl.removeRelationshipsWithIds(relIds)
     expandedNodesMap.value.delete(nodeId)
 
-    const updatedNodes = nvl.getNodes()
-    const updatedRels = nvl.getRelationships()
-
     emit('nodeUnexpanded', {
-      newNodes: updatedNodes,
-      newRels: updatedRels,
+      removedNodeIds: nodeIds,
+      removedRelIds: relIds,
       expandedState: expandedNodesMap.value
     })
   } else {
@@ -273,12 +270,12 @@ const init = (nodes, relationships) => {
   }
 }
 
-watch(props, () => {
-  if (nvl) {
-    nvl.destroy()
-  }
-  init(props.nodes, props.relationships)
-})
+// watch(props, () => {
+//   if (nvl) {
+//     nvl.destroy()
+//   }
+//   init(props.nodes, props.relationships)
+// })
 
 onMounted(async () => {
   init(props.nodes, props.relationships)
