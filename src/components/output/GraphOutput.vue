@@ -52,11 +52,8 @@ const options = {
 const hideOverview = () => {
   hideOverviewBtn.value = !hideOverviewBtn.value
   if (hideOverviewBtn.value) {
-    overview.value.$el.style.height = 'auto'
     hideOverviewBtnIcon.value = 'keyboard_arrow_down'
   } else {
-    overview.value.$el.style.width = '250px'
-    overview.value.$el.style.height = '100%'
     hideOverviewBtnIcon.value = 'keyboard_arrow_up'
   }
 }
@@ -458,7 +455,7 @@ onUnmounted(() => {
       </q-menu>
     </div>
     <div class="overview" ref="overview">
-      <q-card class="overview-card">
+      <q-card class="overview-card" :style="{ height: !hideOverviewBtn ? '100%' : 'auto' }">
         <q-bar class="fixed-top overview-bar">
           <div class="row justify-between" style="width: 100%">
             <q-btn icon="zoom_in" flat square color="white" @click="zoomIn" />
@@ -593,7 +590,6 @@ onUnmounted(() => {
   overflow-y: auto;
 }
 .overview-card {
-  height: 100%;
   overflow-y: auto;
   border-top-left-radius: 4px;
   border-top-right-radius: 0px;
