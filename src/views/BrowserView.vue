@@ -61,19 +61,19 @@ watch(
 </script>
 
 <template>
-  <q-banner dense inline-actions class="banner">
-    You are using IHR's custom IYP Browser!
-    <template v-slot:action>
-      <q-btn
-        outline
-        dense
-        label="Go back to Neo4J Browser"
-        size="sm"
-        href="https://iyp.iijlab.net/iyp/browser/?dbms=iyp-bolt.iijlab.net:443"
-      />
-    </template>
-  </q-banner>
   <div class="container">
+    <q-banner dense inline-actions class="neo4j-browser-banner">
+      You are using IHR's custom IYP Browser!
+      <template v-slot:action>
+        <q-btn
+          outline
+          dense
+          label="Go back to Neo4J Browser"
+          size="sm"
+          href="https://iyp.iijlab.net/iyp/browser/?dbms=iyp-bolt.iijlab.net:443"
+        />
+      </template>
+    </q-banner>
     <div class="browser-input-container">
       <InputPanel @run="runQuery" />
     </div>
@@ -117,8 +117,11 @@ watch(
 .output-panel {
   height: v-bind('outputPanelHeight');
 }
-.banner {
+.neo4j-browser-banner {
   background-color: #263238;
   color: #ffffff;
+  margin-top: -16px;
+  margin-left: -16px;
+  margin-right: -16px;
 }
 </style>

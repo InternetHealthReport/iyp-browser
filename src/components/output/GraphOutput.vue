@@ -483,6 +483,7 @@ onUnmounted(() => {
                         @change="nodeColorChange(selectedElement)"
                         no-header-tabs
                         no-footer
+                        flat
                       />
                       <q-select
                         v-model="selectedElement.captionKey"
