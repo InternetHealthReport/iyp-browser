@@ -609,7 +609,7 @@ onUnmounted(() => {
 .overview-bar {
   position: sticky;
   top: 0px;
-  z-index: 1;
+  z-index: 2;
   height: 30px;
   background-color: #263238;
 }
