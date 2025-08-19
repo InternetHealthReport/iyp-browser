@@ -194,7 +194,7 @@ const nodeCaptionChange = ({ type, captionKey, properties }) => {
       if (captionKey === '<type>') {
         v.caption = type
       } else {
-        v.caption = properties[captionKey]
+        v.caption = String(properties[captionKey])
       }
     }
     return v

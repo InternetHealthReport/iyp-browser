@@ -89,7 +89,7 @@ const Neo4jApi = {
       })
       return {
         id: node['_element_id'],
-        caption: Object.values(properties)[0],
+        caption: String(Object.values(properties)[0]),
         color: colorMap.get(nodeType),
         properties: properties,
         nodeOrRelationship: 'node',
