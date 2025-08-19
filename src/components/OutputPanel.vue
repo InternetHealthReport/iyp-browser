@@ -160,9 +160,27 @@ onMounted(() => {
     <q-skeleton v-if="loading" class="output-skeleton" animation="wave" />
     <div v-else class="output-container">
       <q-btn-group outline class="output-tabs q-ml-md q-pt-sm">
-        <q-btn outline label="Graph" v-if="nodes.length" @click="changeTab('graph')" />
-        <q-btn outline label="Table" v-if="rows.length" @click="changeTab('table')" />
-        <q-btn outline label="Error" v-if="errorText !== ''" @click="changeTab('error')" />
+        <q-btn
+          outline
+          :color="tab === 'graph' ? 'primary' : ''"
+          label="Graph"
+          v-if="nodes.length"
+          @click="changeTab('graph')"
+        />
+        <q-btn
+          outline
+          :color="tab === 'table' ? 'primary' : ''"
+          label="Table"
+          v-if="rows.length"
+          @click="changeTab('table')"
+        />
+        <q-btn
+          outline
+          :color="tab === 'error' ? 'primary' : ''"
+          label="Error"
+          v-if="errorText !== ''"
+          @click="changeTab('error')"
+        />
       </q-btn-group>
       <q-tab-panels v-model="tab" vertical class="output-panels">
         <q-tab-panel name="graph" v-if="nodes.length" class="output-tab-panel">
