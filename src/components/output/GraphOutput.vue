@@ -187,14 +187,14 @@ const nodeColorChange = ({ type, color }) => {
   emit('updateNodeProperties', nodes)
 }
 
-const nodeCaptionChange = ({ type, captionKey, properties }) => {
+const nodeCaptionChange = ({ type, captionKey }) => {
   const nodes = nvl.getNodes().map((v) => {
     if (v.type === type) {
       v.captionKey = captionKey
       if (captionKey === '<type>') {
         v.caption = type
       } else {
-        v.caption = String(properties[captionKey])
+        v.caption = String(v.properties[captionKey])
       }
     }
     return v
