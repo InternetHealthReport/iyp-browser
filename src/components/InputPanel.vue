@@ -103,42 +103,74 @@ onMounted(() => {
           endColumn: position.column
         })
 
+        // Splits query text whenever a MATCH / OPTIONAL MATCH / MERGE starts.
         const split = textUtilPosition.split(/(?=MATCH|OPTIONAL MATCH|MERGE)/gi)
+
+        // Picks the last MATCH/MERGE clause to analyze.
         const lastMatchClause = split.length ? split[split.length - 1] : textUtilPosition
 
+        // Detects the node labels inside (alias:Label).
         const matchNodes = [...lastMatchClause.matchAll(/\(\s*\w*\s*:\s*([A-Za-z0-9_]+)/g)]
+
+        // Detects the relationship type inside [alias:TYPE].
         const matchRels = [
           ...lastMatchClause.matchAll(/\[\s*\w*\s*:\s*([A-Za-z0-9_]+)(?=[\s\]\-]|$)/g)
         ]
 
         const trimmedBeforeCursor = textUtilPosition.trimRight()
+
+        // Detects if cursor is right after opening a block like CALL { … } or EXISTS { … }, etc.
         const justOpenedBlock =
           /\b(?:WHERE\s+NOT\s+EXISTS|CALL|EXISTS|FOREACH\s*\([^)]+\))\s*\{$/.test(
             trimmedBeforeCursor
           )
+
+        // Detects if user just typed "MATCH({" meaning a node map literal started but no node label was specified.
         const genericNodeMatch = textUtilPosition.match(/MATCH\s*\(\s*\{\s*$/)
 
+        // Detects either node properties inside { … } or alias.property typing (like n.name). eg. "MATCH (a:Person {na" captures na .
         const nodePropMatch = textUtilPosition.match(
           /(?:\(\s*\w*\s*:\s*[A-Za-z0-9_]+\s*\{\s*([A-Za-z0-9_]*))|\b([A-Za-z][A-Za-z0-9_]*)\.\s*([A-Za-z0-9_]*)$/
         )
+
+        // Detects relationship properties being typed inside { … }. eg "MATCH (a)-[r:KNOWS {ye" captures ye .
         const relPropMatch = textUtilPosition.match(
           /\[\s*\w*\s*:\s*[A-Za-z0-9_]+\s*\{\s*([A-Za-z0-9_]*)$/
         )
+
+        // Captures node alias + label from patterns like (alias:label).
         const aliasLabelRE = /\(\s*(\w*)\s*:\s*([A-Za-z0-9_]+)/g
+
+        // Captures relationship alias + type from patterns like [alias:type].
         const relAliasTypeRE = /\[\s*(\w*)\s*:\s*([A-Za-z0-9_]+)/g
+
+        // Detects when typing alias.property (like a.asn).
         const dotPropMatch = textUtilPosition.match(
           /\b([A-Za-z][A-Za-z0-9_]*)\.\s*([A-Za-z0-9_]*)$/
         )
+
+        // Detects a chained node being typed after something like (a)--(b:Label).
         const chainedNodeMatch = textUtilPosition.match(/\)\s*--\s*\(\s*(\w*\s*:)?\s*[\w]+.*$/)
+
+        // Finds path aliases in patterns like MATCH p = (a)--(b).
         const pathAliasMatch = [...textUtilPosition.matchAll(/MATCH\s+(\w+)\s*=\s*\(.*?\)/g)]
+
+        // Extracts only the alias names (e.g. "p").
         const pathAliases = pathAliasMatch.map((m) => m[1])
+
+        // Matches relationship being typed with properties but no type (like [{id: …}]).
         const relWithoutTypePropMatch = textUtilPosition.match(/\[\s*\{\s*([A-Za-z0-9_]*)$/)
 
+        // Captures alias + path variable in "r IN relationships(p)".
         const relInPathMatch = textUtilPosition.match(/\b(\w+)\s+IN\s+relationships\(\s*(\w+)\s*\)/)
+
+        // Captures alias + path variable in "n IN nodes(p)".
         const nodeInPathMatch = textUtilPosition.match(/\b(\w+)\s+IN\s+nodes\(\s*(\w+)\s*\)/)
 
+        // Gives the most recent node typed 
         const activeNodeLabel = matchNodes.length ? matchNodes[matchNodes.length - 1][1] : null
 
+        // Gives the most recent relationship typed
         const activeRelationship =
           matchRels.length && !chainedNodeMatch ? matchRels[matchRels.length - 1][1] : null
 
@@ -161,34 +193,36 @@ onMounted(() => {
         let properties = []
 
         if (activeNodeLabel) {
-          relationships = Object.keys(schema.schema[activeNodeLabel] || {})
+          relationships = Object.keys(schema.schema[activeNodeLabel] || {}) // Adds all relationships nodes connected to the detected node
           const connectedVia = schema.schema[activeNodeLabel] || {}
           targetNodes = Object.values(connectedVia).flat()
-          targetNodes = [...new Set(targetNodes)]
+          targetNodes = [...new Set(targetNodes)] // Adds all unique nodes connected to the detected node type
         }
         if (justOpenedBlock) {
-          return { suggestions: [] }
+          return { suggestions: [] } 
         }
         if (genericNodeMatch) {
           const allProps = Object.values(schema.node_properties || {}).flat()
-          properties = [...new Set(allProps)]
+          properties = [...new Set(allProps)] // Adds all unique properties connected to that node type
         }
         if (activeRelationship && activeNodeLabel) {
-          targetNodes = schema.schema[activeNodeLabel]?.[activeRelationship] || []
+          targetNodes = schema.schema[activeNodeLabel]?.[activeRelationship] || [] // Adds all target nodes connected to the active node through the relationship typed
         }
         if (activeNodeLabel && nodePropMatch) {
-          properties = [...new Set(schema.node_properties[activeNodeLabel] || [])]
+          properties = [...new Set(schema.node_properties[activeNodeLabel] || [])] // Adds all the properties available for that node type
         }
         if (activeRelationship && relPropMatch) {
-          properties = [...new Set(schema.relationship_properties[activeRelationship] || [])]
+          properties = [...new Set(schema.relationship_properties[activeRelationship] || [])] // Adds all the properties available for that relationship type
         }
         if (activeNodeLabel && relWithoutTypePropMatch) {
           const relTypes = Object.keys(schema.schema[activeNodeLabel] || {})
           properties = relTypes.flatMap((type) => schema.relationship_properties[type] || [])
-          properties = [...new Set(properties)]
+          properties = [...new Set(properties)] // Adds all the unique properties for all relationships connected to the active node
         }
+        // Handles property suggestions for alias.property patterns (like r.name or n.id)
         if (dotPropMatch) {
           const alias = dotPropMatch[1]
+          // Case 1: Relationship alias in path context (r IN relationships(p))
           if (relInPathMatch && alias === relInPathMatch[1]) {
             const pathVar = relInPathMatch[2]
             let relTypes = []
@@ -201,7 +235,9 @@ onMounted(() => {
             }
             properties = relTypes.flatMap((type) => schema.relationship_properties[type] || [])
             properties = [...new Set(properties)]
-          } else if (nodeInPathMatch && alias === nodeInPathMatch[1]) {
+          } 
+          // Case 2: Node alias in path context (n IN nodes(p)) 
+          else if (nodeInPathMatch && alias === nodeInPathMatch[1]) {
             const pathVar = nodeInPathMatch[2]
             let nodeLabels = []
             for (const m of textUtilPosition.matchAll(
@@ -215,6 +251,7 @@ onMounted(() => {
             properties = [
               ...new Set(nodeLabels.flatMap((label) => schema.node_properties[label] || []))
             ]
+            // Case 3: Regular alias lookup from aliasMap
           } else {
             if (pathAliases.includes(alias)) {
               return { suggestions: [] }

@@ -79,18 +79,21 @@ const handleEditorHeightChange = (newHeight) => {
   outputPanel.value.style.height = `${height + diff}px`
 }
 
+// Removes nodes and relationships from arrays after node unexpansion
 const handleNodeExpanded = ({ newNodes, newRels, expandedState }) => {
   nodes.value.push(...newNodes)
   relationships.value.push(...newRels)
   expandedNodesState.value = expandedState
 }
 
+// Updates the nodes and the relationships array to remove the target nodes and relationships after unexpansion of node
 const handleNodeUnexpanded = ({ removedNodeIds, removedRelIds, expandedState }) => {
   nodes.value = nodes.value.filter((n) => !removedNodeIds.includes(n.id))
   relationships.value = relationships.value.filter((r) => !removedRelIds.includes(r.id))
   expandedNodesState.value = expandedState
 }
 
+// Removes deleted node and its connected relationships from arrays
 const handleNodeDeleted = ({ removedNodeIds, removedRelIds }) => {
   nodes.value = nodes.value.filter((n) => !removedNodeIds.includes(n.id))
   relationships.value = relationships.value.filter((r) => !removedRelIds.includes(r.id))

@@ -70,6 +70,9 @@ const reset = () => {
   nvl.resetZoom()
 }
 
+// Fetches a node per relationship connected to the specified node via all valid relationship types for that node
+// Returns an array of objects containing the fetched relationships and target nodes
+// (connections[..1]) Samples first connection per relationship type
 const fetchConnectedNodes = async (nodeId) => {
   const cypher = `
     MATCH (n)
@@ -87,12 +90,15 @@ const fetchConnectedNodes = async (nodeId) => {
   }
 }
 
+// Expands the specified node and adds the target nodes and relationships to the graph
 const nodeExpansion = async (nodeId) => {
   const { nodes: newNodes, relationships: newRels } = await fetchConnectedNodes(nodeId)
 
+  // Fetches the existing nodes and relationships present in the graph 
   const existingNodeIds = new Set(nvl.getNodes().map((n) => n.id))
   const existingRelIds = new Set(nvl.getRelationships().map((r) => r.id))
 
+  // Filter out nodes/relationships that are not in the graph
   let filteredNodes = newNodes.filter((n) => !existingNodeIds.has(n.id))
   const filteredRels = newRels.filter((r) => !existingRelIds.has(r.id))
 
@@ -106,17 +112,23 @@ const nodeExpansion = async (nodeId) => {
       }
       return fn
     })
+
+    // Adds the filtered nodes and relationships to the graph
     nvl.addAndUpdateElementsInGraph(filteredNodes, filteredRels)
     expandedNodesMap.value.set(nodeId, {
       nodes: filteredNodes,
       relationships: filteredRels
     })
+
+    // Emits the filtered nodes and relationships to GraphOutput.vue
     emit('nodeExpanded', {
       newNodes: filteredNodes,
       newRels: filteredRels,
       expandedState: expandedNodesMap.value
     })
   } else {
+
+    // Notifies if the node isnt expandable or it is already expanded
     q.notify({
       message: 'Node is not expandable',
       position: 'top',
@@ -127,8 +139,12 @@ const nodeExpansion = async (nodeId) => {
   }
 }
 
+// Unexpands the node and removes the nodes added after expansion of the specified node
+// Keeps the nodes that are already expanded
 const nodeUnexpand = (nodeId) => {
-  const expansion = expandedNodesMap.value.get(nodeId)
+  const expansion = expandedNodesMap.value.get(nodeId) // Gets the target nodes for the node to be unexpanded
+
+  //Checks whether the node to be unexpanded is connected to a node that is already expanded
   if (expansion) {
     const nodeIds = expansion.nodes
       .filter((n) => {
@@ -140,16 +156,20 @@ const nodeUnexpand = (nodeId) => {
       .map((n) => n.id)
     const relIds = expansion.relationships.map((r) => r.id)
 
+    // Removes the nodes and relationships connected to the specified node that are not already expanded 
     nvl.removeNodesWithIds(nodeIds)
     nvl.removeRelationshipsWithIds(relIds)
     expandedNodesMap.value.delete(nodeId)
 
+    // Emits the ids of the removed nodes and relationships to GraphOutput.vue
     emit('nodeUnexpanded', {
       removedNodeIds: nodeIds,
       removedRelIds: relIds,
       expandedState: expandedNodesMap.value
     })
   } else {
+
+    // Notifies if the node isn't unexpandable
     q.notify({
       message: 'Node is not un-expandable',
       position: 'top',
@@ -160,14 +180,19 @@ const nodeUnexpand = (nodeId) => {
   }
 }
 
+// Deletes the specified node and removes it from the graph
 const nodeDeletion = (nodeId) => {
+
+  // Gets all relationships connected to the node being deleted
   const relIds = props.relationships
     .filter((r) => r.from === nodeId || r.to === nodeId)
     .map((r) => r.id)
 
+  // Removes the node and the connected relationships from the graph
   nvl.removeNodesWithIds([nodeId])
   nvl.removeRelationshipsWithIds(relIds)
 
+  // Emits the deleted node and connected relationships to GraphOutput.vue
   emit('nodeDeleted', {
     removedNodeIds: [nodeId],
     removedRelIds: relIds
@@ -205,6 +230,7 @@ const nodeCaptionChange = ({ type, captionKey }) => {
   emit('updateNodeProperties', nodes)
 }
 
+// Checks whether the specified node has already been expanded
 const isNodeExpanded = (nodeId) => {
   return expandedNodesMap.value.has(nodeId)
 }
