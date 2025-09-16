@@ -1,4 +1,4 @@
-const basePath = '/browser' // default value: '/'
+const basePath = '/' // default value: '/'
 
 const GlobalVariables = {
   install: (app) => {
