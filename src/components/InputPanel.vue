@@ -167,7 +167,7 @@ onMounted(() => {
         // Captures alias + path variable in "n IN nodes(p)".
         const nodeInPathMatch = textUtilPosition.match(/\b(\w+)\s+IN\s+nodes\(\s*(\w+)\s*\)/)
 
-        // Gives the most recent node typed 
+        // Gives the most recent node typed
         const activeNodeLabel = matchNodes.length ? matchNodes[matchNodes.length - 1][1] : null
 
         // Gives the most recent relationship typed
@@ -199,7 +199,7 @@ onMounted(() => {
           targetNodes = [...new Set(targetNodes)] // Adds all unique nodes connected to the detected node type
         }
         if (justOpenedBlock) {
-          return { suggestions: [] } 
+          return { suggestions: [] }
         }
         if (genericNodeMatch) {
           const allProps = Object.values(schema.node_properties || {}).flat()
@@ -235,8 +235,8 @@ onMounted(() => {
             }
             properties = relTypes.flatMap((type) => schema.relationship_properties[type] || [])
             properties = [...new Set(properties)]
-          } 
-          // Case 2: Node alias in path context (n IN nodes(p)) 
+          }
+          // Case 2: Node alias in path context (n IN nodes(p))
           else if (nodeInPathMatch && alias === nodeInPathMatch[1]) {
             const pathVar = nodeInPathMatch[2]
             let nodeLabels = []

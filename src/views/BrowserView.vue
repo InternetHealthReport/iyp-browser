@@ -23,7 +23,11 @@ const clearQuery = (uuid) => {
 }
 
 const shareQuery = (query) => {
-  const urlToShare = `${window.location.origin}/?session=[${JSON.stringify(query)}]`
+  const pathName =
+    GlobalVariables.basePath.slice(-1) === '/'
+      ? GlobalVariables.basePath
+      : `${GlobalVariables.basePath}/`
+  const urlToShare = `${window.location.origin}${pathName}?session=[${JSON.stringify(query)}]`
   copyToClipboard(urlToShare)
 }
 

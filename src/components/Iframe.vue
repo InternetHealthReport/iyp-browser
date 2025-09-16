@@ -1,8 +1,10 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, inject } from 'vue'
 import hljs from 'highlight.js'
 import 'highlight.js/scss/vs.scss'
 import { copyToClipboard } from 'quasar'
+
+const GlobalVariables = inject('GlobalVariables')
 
 const props = defineProps(['query'])
 
@@ -15,7 +17,11 @@ watch(
     const query = {
       query: props.query
     }
-    iFrameCode.value = `<iframe src="${window.location.origin}/embed/?session=[${encodeURIComponent(JSON.stringify(query))}]" width="100%" height="500px"></iframe>`
+    const pathName =
+      GlobalVariables.basePath.slice(-1) === '/'
+        ? GlobalVariables.basePath
+        : `${GlobalVariables.basePath}/`
+    iFrameCode.value = `<iframe src="${window.location.origin}${pathName}embed/?session=[${encodeURIComponent(JSON.stringify(query))}]" width="100%" height="500px"></iframe>`
   }
 )
 </script>

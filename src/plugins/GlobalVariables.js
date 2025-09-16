@@ -1,6 +1,9 @@
+const basePath = '/browser' // default value: '/'
+
 const GlobalVariables = {
   install: (app) => {
     const GlobalVariables = {
+      basePath: basePath,
       outputPanelHeight: 580,
       graphOverviewPanelWidth: 250,
       disableOutputPanelResizer: false,
@@ -10,4 +13,4 @@ const GlobalVariables = {
   }
 }
 
-export { GlobalVariables }
+export { GlobalVariables, basePath }

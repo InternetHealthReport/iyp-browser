@@ -94,7 +94,7 @@ const fetchConnectedNodes = async (nodeId) => {
 const nodeExpansion = async (nodeId) => {
   const { nodes: newNodes, relationships: newRels } = await fetchConnectedNodes(nodeId)
 
-  // Fetches the existing nodes and relationships present in the graph 
+  // Fetches the existing nodes and relationships present in the graph
   const existingNodeIds = new Set(nvl.getNodes().map((n) => n.id))
   const existingRelIds = new Set(nvl.getRelationships().map((r) => r.id))
 
@@ -127,7 +127,6 @@ const nodeExpansion = async (nodeId) => {
       expandedState: expandedNodesMap.value
     })
   } else {
-
     // Notifies if the node isnt expandable or it is already expanded
     q.notify({
       message: 'Node is not expandable',
@@ -156,7 +155,7 @@ const nodeUnexpand = (nodeId) => {
       .map((n) => n.id)
     const relIds = expansion.relationships.map((r) => r.id)
 
-    // Removes the nodes and relationships connected to the specified node that are not already expanded 
+    // Removes the nodes and relationships connected to the specified node that are not already expanded
     nvl.removeNodesWithIds(nodeIds)
     nvl.removeRelationshipsWithIds(relIds)
     expandedNodesMap.value.delete(nodeId)
@@ -168,7 +167,6 @@ const nodeUnexpand = (nodeId) => {
       expandedState: expandedNodesMap.value
     })
   } else {
-
     // Notifies if the node isn't unexpandable
     q.notify({
       message: 'Node is not un-expandable',
@@ -182,7 +180,6 @@ const nodeUnexpand = (nodeId) => {
 
 // Deletes the specified node and removes it from the graph
 const nodeDeletion = (nodeId) => {
-
   // Gets all relationships connected to the node being deleted
   const relIds = props.relationships
     .filter((r) => r.from === nodeId || r.to === nodeId)
