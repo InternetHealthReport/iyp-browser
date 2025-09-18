@@ -472,7 +472,7 @@ onUnmounted(() => {
               }
             "
           >
-            <q-item-section> Delete </q-item-section>
+            <q-item-section> Hide </q-item-section>
           </q-item>
         </q-list>
       </q-menu>
