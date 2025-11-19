@@ -17,11 +17,12 @@ watch(
     const query = {
       query: props.query
     }
+    const session = btoa(JSON.stringify([query]))
     const pathName =
       GlobalVariables.basePath.slice(-1) === '/'
         ? GlobalVariables.basePath
         : `${GlobalVariables.basePath}/`
-    iFrameCode.value = `<iframe src="${window.location.origin}${pathName}embed/?session=[${encodeURIComponent(JSON.stringify(query))}]" width="100%" height="500px"></iframe>`
+    iFrameCode.value = `<iframe src="${window.location.origin}${pathName}embed/?session=${session}" width="100%" height="500px"></iframe>`
   }
 )
 </script>

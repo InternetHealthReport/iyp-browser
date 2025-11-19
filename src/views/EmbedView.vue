@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import OutputPanel from '@/components/OutputPanel.vue'
 
 const route = useRoute()
-const query = ref(JSON.parse(route.query.session)[0])
+const query = ref(JSON.parse(atob(route.query.session))[0])
 </script>
 
 <template>
