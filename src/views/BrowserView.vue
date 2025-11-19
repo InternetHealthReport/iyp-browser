@@ -2,6 +2,7 @@
 import { ref, watch, inject } from 'vue'
 import InputPanel from '@/components/InputPanel.vue'
 import OutputPanel from '@/components/OutputPanel.vue'
+import DrawerPanel from '@/components/DrawerPanel.vue'
 import { uid, copyToClipboard } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -9,9 +10,10 @@ const GlobalVariables = inject('GlobalVariables')
 
 const route = useRoute()
 const router = useRouter()
-const queries = ref(route.query.session ? JSON.parse(route.query.session) : [])
+const queries = ref(route.query.session ? JSON.parse(atob(route.query.session)) : [])
 const outputPanel = ref()
 const outputPanelHeight = ref(`${GlobalVariables.outputPanelHeight}px`)
+const drawer = ref(true)
 
 const runQuery = (query) => {
   const uuid = uid()
@@ -27,7 +29,8 @@ const shareQuery = (query) => {
     GlobalVariables.basePath.slice(-1) === '/'
       ? GlobalVariables.basePath
       : `${GlobalVariables.basePath}/`
-  const urlToShare = `${window.location.origin}${pathName}?session=[${JSON.stringify(query)}]`
+  const session = btoa(JSON.stringify([query]))
+  const urlToShare = `${window.location.origin}${pathName}?session=${session}`
   copyToClipboard(urlToShare)
 }
 
@@ -50,7 +53,7 @@ const pushRoute = () => {
   router.push({
     replace: true,
     query: Object.assign({}, route.query, {
-      session: JSON.stringify(queries.value)
+      session: btoa(JSON.stringify(queries.value))
     })
   })
 }
@@ -65,38 +68,43 @@ watch(
 </script>
 
 <template>
-  <div class="container">
-    <q-banner dense inline-actions class="neo4j-browser-banner">
-      You are using IHR's custom IYP Browser!
-      <template v-slot:action>
+  <q-layout class="container" container view="hHh Lpr lff">
+    <q-header class="header" elevated>
+      <q-toolbar>
+        <q-btn @click="drawer = !drawer" icon="menu" dense outline />
+        <q-toolbar-title>You are using IHR's custom IYP Browser!</q-toolbar-title>
         <q-btn
           outline
           dense
           label="Go back to Neo4J Browser"
-          size="sm"
           href="https://iyp.iijlab.net/iyp/browser/?dbms=iyp-bolt.iijlab.net:443"
         />
-      </template>
-    </q-banner>
-    <div class="browser-input-container">
-      <InputPanel @run="runQuery" />
-    </div>
-    <div class="browser-output-container">
-      <div v-for="query in queries" :key="query.uuid">
-        <OutputPanel
-          ref="outputPanel"
-          :query="query.query"
-          :disable-input="false"
-          :disable-top-bar="false"
-          :disable-resizer="GlobalVariables.disableOutputPanelResizer"
-          @clear="clearQuery(query.uuid)"
-          @share="shareQuery(query)"
-          @update="updateQuery($event, query.uuid)"
-          class="output-panel"
-        />
+      </q-toolbar>
+    </q-header>
+    <q-drawer v-model="drawer" :width="300" :breakpoint="500">
+      <DrawerPanel @run="runQuery" />
+    </q-drawer>
+    <q-page-container class="drawer-container">
+      <div class="browser-input-container">
+        <InputPanel @run="runQuery" />
       </div>
-    </div>
-  </div>
+      <div class="browser-output-container">
+        <div v-for="query in queries" :key="query.uuid">
+          <OutputPanel
+            ref="outputPanel"
+            :query="query.query"
+            :disable-input="false"
+            :disable-top-bar="false"
+            :disable-resizer="GlobalVariables.disableOutputPanelResizer"
+            @clear="clearQuery(query.uuid)"
+            @share="shareQuery(query)"
+            @update="updateQuery($event, query.uuid)"
+            class="output-panel"
+          />
+        </div>
+      </div>
+    </q-page-container>
+  </q-layout>
 </template>
 
 <style scoped>
@@ -104,14 +112,18 @@ watch(
   display: flex;
   height: 100vh;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
   background-color: #f9f9f9;
+}
+.header {
+  background-color: #263238;
+  color: #ffffff;
 }
 .browser-input-container {
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 4px;
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 .browser-output-container {
   display: flex;
@@ -121,11 +133,8 @@ watch(
 .output-panel {
   height: v-bind('outputPanelHeight');
 }
-.neo4j-browser-banner {
-  background-color: #263238;
-  color: #ffffff;
-  margin-top: -16px;
-  margin-left: -16px;
-  margin-right: -16px;
+.drawer-container {
+  margin-left: 16px;
+  margin-right: 16px;
 }
 </style>

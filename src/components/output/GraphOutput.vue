@@ -491,8 +491,12 @@ onUnmounted(() => {
           <div class="fixed-top overview-info">
             <div v-if="selectedElement.nodeOrRelationship === 'node'">
               <div class="text-subtitle1">Node properties</div>
-              <q-badge
-                rounded
+              <q-btn
+                flat
+                dense
+                padding="none xs"
+                size="11px"
+                no-caps
                 :label="selectedElement.type"
                 :text-color="getContrastingColor(selectedElement.color)"
                 :style="`background-color: ${selectedElement.color};`"
@@ -518,11 +522,17 @@ onUnmounted(() => {
                     </q-card-section>
                   </q-card>
                 </q-popup-proxy>
-              </q-badge>
+              </q-btn>
             </div>
             <div v-else-if="selectedElement.nodeOrRelationship === 'relationship'">
               <div class="text-subtitle1">Relationship properties</div>
-              <q-badge
+              <q-btn
+                disable
+                flat
+                dense
+                padding="none xs"
+                size="11px"
+                no-caps
                 :label="selectedElement.type"
                 text-color="white"
                 style="background-color: #848484"
@@ -539,7 +549,12 @@ onUnmounted(() => {
                   )"
                   :key="index"
                 >
-                  <q-badge
+                  <q-btn
+                    flat
+                    dense
+                    padding="none xs"
+                    size="11px"
+                    no-caps
                     :label="node.type"
                     :text-color="getContrastingColor(node.color)"
                     :style="`background-color: ${node.color};`"
@@ -565,7 +580,7 @@ onUnmounted(() => {
                         </q-card-section>
                       </q-card>
                     </q-popup-proxy>
-                  </q-badge>
+                  </q-btn>
                 </span>
               </div>
               <div class="text-subtitle2">Relationship types</div>
@@ -575,7 +590,17 @@ onUnmounted(() => {
                   v-for="(relType, index) in [...new Set(relationships.map((el) => el.type))]"
                   :key="index"
                 >
-                  <q-badge :label="relType" text-color="white" style="background-color: #848484" />
+                  <q-btn
+                    disable
+                    flat
+                    dense
+                    padding="none xs"
+                    size="11px"
+                    no-caps
+                    :label="relType"
+                    text-color="white"
+                    style="background-color: #848484"
+                  />
                 </span>
               </div>
             </div>
