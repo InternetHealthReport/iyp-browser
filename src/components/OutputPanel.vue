@@ -12,7 +12,7 @@ const GlobalVariables = inject('GlobalVariables')
 
 const emits = defineEmits(['clear', 'share', 'update'])
 
-const props = defineProps(['query', 'disableInput', 'disableTopBar', 'disableResizer'])
+const props = defineProps(['query', 'disableInput', 'disableTopBar', 'disableResizer', 'hideGraphOverview'])
 
 const cypherQuery = ref('')
 const tab = ref('graph')
@@ -192,6 +192,7 @@ onMounted(() => {
             :relationships="relationships"
             :expanded-nodes-state="expandedNodesState"
             :disable-resizer="GlobalVariables.disableGraphOverviewPanelResizer"
+            :hide-overview="hideGraphOverview"
             @nodeExpanded="handleNodeExpanded"
             @nodeUnexpanded="handleNodeUnexpanded"
             @nodeDeleted="handleNodeDeleted"

@@ -9,22 +9,33 @@ const GlobalVariables = inject('GlobalVariables')
 const props = defineProps(['query'])
 
 const showIframeDialog = ref(false)
-const iFrameCode = ref('')
+const showGraphOverview = ref(true)
 
-watch(
-  () => props.query,
-  () => {
-    const query = {
-      query: props.query
-    }
-    const session = btoa(JSON.stringify([query]))
-    const pathName =
-      GlobalVariables.basePath.slice(-1) === '/'
-        ? GlobalVariables.basePath
-        : `${GlobalVariables.basePath}/`
-    iFrameCode.value = `<iframe src="${window.location.origin}${pathName}embed/?session=${session}" width="100%" height="500px"></iframe>`
+const createIframeCode = () => {
+  const query = {
+    query: props.query
   }
-)
+  const session = btoa(JSON.stringify([query]))
+  const pathName =
+    GlobalVariables.basePath.slice(-1) === '/'
+      ? GlobalVariables.basePath
+      : `${GlobalVariables.basePath}/`
+  return `<iframe src="${window.location.origin}${pathName}embed/?session=${session}&showGraphOverview=${showGraphOverview.value}" width="100%" height="500px"></iframe>`
+}
+// watch(
+//   () => props.query,
+//   () => {
+//     const query = {
+//       query: props.query
+//     }
+//     const session = btoa(JSON.stringify([query]))
+//     const pathName =
+//       GlobalVariables.basePath.slice(-1) === '/'
+//         ? GlobalVariables.basePath
+//         : `${GlobalVariables.basePath}/`
+//     iFrameCode.value = `<iframe src="${window.location.origin}${pathName}embed/?session=${session}&showGraphOverview=${showGraphOverview.value}" width="100%" height="500px"></iframe>`
+//   }
+// )
 </script>
 
 <template>
@@ -39,20 +50,12 @@ watch(
       <q-card-section>
         <div>
           You can embed this content within your webpage.
-          <br />
-          <q-btn
-            no-caps
-            dense
-            flat
-            @click="copyToClipboard(iFrameCode)"
-            style="width: 100%"
-            align="left"
-          >
-            <pre
-              style="text-align: left"
-            ><code style="white-space: pre-wrap;" v-html="hljs.highlight(iFrameCode, {language: 'html'}).value"></code></pre>
-            <q-tooltip> Click to copy </q-tooltip>
-          </q-btn>
+        </div>
+        <div>
+          <q-checkbox v-model="showGraphOverview" label="Show graph overview" />
+        </div>
+        <div>
+          <q-btn no-caps outline @click="copyToClipboard(createIframeCode())" label="Copy iFrame code" />
         </div>
       </q-card-section>
       <q-card-actions align="right">

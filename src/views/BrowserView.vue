@@ -96,6 +96,7 @@ watch(
             :disable-input="false"
             :disable-top-bar="false"
             :disable-resizer="GlobalVariables.disableOutputPanelResizer"
+            :hide-graph-overview="false"
             @clear="clearQuery(query.uuid)"
             @share="shareQuery(query)"
             @update="updateQuery($event, query.uuid)"

@@ -14,7 +14,7 @@ import interact from 'interactjs'
 const Neo4jApi = inject('Neo4jApi')
 const GlobalVariables = inject('GlobalVariables')
 const emit = defineEmits(['nodeExpanded', 'nodeUnexpanded', 'nodeDeleted', 'updateNodeProperties'])
-const props = defineProps(['nodes', 'relationships', 'expandedNodesState', 'disableResizer'])
+const props = defineProps(['nodes', 'relationships', 'expandedNodesState', 'disableResizer', 'hideOverview'])
 
 const q = useQuasar()
 const expandedNodesMap = ref(props.expandedNodesState)
@@ -30,8 +30,8 @@ const selectedElement = ref({
   properties: {},
   clicked: false
 })
-const hideOverviewBtn = ref(false)
-const hideOverviewBtnIcon = ref('keyboard_arrow_up')
+const hideOverviewBtn = ref(props.hideOverview)
+const hideOverviewBtnIcon = ref(props.hideOverview ? 'keyboard_arrow_down' : 'keyboard_arrow_up')
 const overview = ref()
 let nvl = null
 const nodeRightClickMenu = ref({
@@ -477,7 +477,7 @@ onUnmounted(() => {
         </q-list>
       </q-menu>
     </div>
-    <div class="overview" ref="overview">
+    <div class="overview" ref="overview" :style="{ height: !hideOverviewBtn ? '100%' : 'auto' }">
       <q-card class="overview-card" :style="{ height: !hideOverviewBtn ? '100%' : 'auto' }">
         <q-bar class="fixed-top overview-bar">
           <div class="row justify-between" style="width: 100%">
@@ -635,7 +635,6 @@ onUnmounted(() => {
   top: 0px;
   right: 0px;
   width: v-bind('graphOverviewPanelWidth');
-  height: 100%;
   overflow-y: auto;
 }
 .overview-card {
