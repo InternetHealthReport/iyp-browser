@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, onMounted } from 'vue'
+import { ref, inject, onMounted, onUnmounted } from 'vue'
 import InputPanel from '@/components/InputPanel.vue'
 import GraphOutput from '@/components/output/GraphOutput.vue'
 import TableOutput from '@/components/output/TableOutput.vue'
@@ -27,6 +27,7 @@ const isFullscreen = ref(false)
 const heightBeforeFullscreen = ref('')
 let previousEditorHeight = 0
 const expandedNodesState = ref(new Map())
+let interactOutputPanel = null
 
 const runCypher = async (cypher) => {
   loading.value = true
@@ -110,7 +111,7 @@ const changeTab = (tabName) => {
 onMounted(() => {
   run(props.query)
   if (!props.disableResizer) {
-    interact(outputPanel.value)
+    interactOutputPanel = interact(outputPanel.value)
       .origin('self')
       .resizable({
         edges: { top: false, left: false, bottom: true, right: false },
@@ -127,6 +128,12 @@ onMounted(() => {
           })
         ]
       })
+  }
+})
+
+onUnmounted(() => {
+  if (interactOutputPanel) {
+    interactOutputPanel.unset()
   }
 })
 </script>

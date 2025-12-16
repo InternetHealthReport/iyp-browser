@@ -83,10 +83,6 @@ onMounted(() => {
       updateEditorHeight()
     }
   })
-
-  window.addEventListener('hitResult', () => {
-    // console.log(e)
-  })
   monaco.languages.register({
     id: 'cypher',
     extensions: ['.cypher'],

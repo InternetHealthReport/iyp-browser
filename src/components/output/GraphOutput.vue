@@ -39,6 +39,7 @@ const nodeRightClickMenu = ref({
   clicked: false
 })
 const graphOverviewPanelWidth = ref(`${GlobalVariables.graphOverviewPanelWidth}px`)
+let interactOverview = null
 
 const options = {
   disableTelemetry: true,
@@ -409,7 +410,7 @@ const init = (nodes, relationships) => {
 onMounted(async () => {
   init(props.nodes, props.relationships)
   if (!props.disableResizer) {
-    interact(overview.value)
+    interactOverview = interact(overview.value)
       .origin('self')
       .resizable({
         edges: { top: false, left: true, bottom: false, right: false },
@@ -432,6 +433,9 @@ onMounted(async () => {
 onUnmounted(() => {
   if (nvl) {
     nvl.destroy()
+  }
+  if (interactOverview) {
+    interactOverview.unset()
   }
 })
 </script>
