@@ -71,7 +71,11 @@ onMounted(() => {
     contextmenu: false,
     scrollBeyondLastLine: false,
     lineHeight: lineHeight,
-    padding: { top: 10, bottom: 10 }
+    padding: { top: 10, bottom: 10 },
+    scrollbar: {
+      alwaysConsumeMouseWheel: false
+    }
+
   })
 
   let previousLineCount = editor.getModel().getLineCount()
