@@ -37,6 +37,12 @@ const runCypher = async (cypher) => {
     relationships.value = res.graph.relationships
     rows.value = res.table.rows
     columns.value = res.table.columns
+    if (!nodes.value.length && !rows.value.length) {
+      errorText.value = 'Query executed successfully, No matching data was found.'
+      tab.value = 'error'
+      loading.value = false
+      return
+    }
     if (!nodes.value.length) {
       tab.value = 'table'
     }
