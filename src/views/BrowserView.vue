@@ -3,7 +3,7 @@ import { ref, watch, inject } from 'vue'
 import InputPanel from '@/components/InputPanel.vue'
 import OutputPanel from '@/components/OutputPanel.vue'
 import DrawerPanel from '@/components/DrawerPanel.vue'
-import { uid, copyToClipboard } from 'quasar'
+import { uid, copyToClipboard, useQuasar } from 'quasar'
 import { useRoute, useRouter } from 'vue-router'
 
 const GlobalVariables = inject('GlobalVariables')
@@ -14,6 +14,7 @@ const queries = ref(route.query.session ? JSON.parse(atob(route.query.session)) 
 const outputPanel = ref()
 const outputPanelHeight = ref(`${GlobalVariables.outputPanelHeight}px`)
 const drawer = ref(true)
+const $q = useQuasar()
 
 const runQuery = (query) => {
   const uuid = uid()
@@ -32,6 +33,9 @@ const shareQuery = (query) => {
   const session = btoa(JSON.stringify([query]))
   const urlToShare = `${window.location.origin}${pathName}?session=${session}`
   copyToClipboard(urlToShare)
+    .then(() => {
+      $q.notify({message: "Link copied to clipboard!", color: "positive"})
+    })
 }
 
 const updateQuery = (query, uuid) => {
